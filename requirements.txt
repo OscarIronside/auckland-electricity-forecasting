@@ -7,3 +7,5 @@ shap
 jupyterlab
 ipykernel
 tzdata
+streamlit==1.65.0
+altair==6.3.0
