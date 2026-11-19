@@ -14,7 +14,7 @@ All inputs are included in the repository.
 
 Source: [Electricity Authority EMI reconciled injection and offtake](https://www.emi.ea.govt.nz/Wholesale/Datasets/Volumes/Reconciliation), retrieved on 3 October 2026.
 
-The coursework combined offtake for Vector's Waitemata and Auckland reporting regions, IDs 3 and 4. This represents regional demand and does not exactly follow Auckland's administrative boundaries. The half-hourly file contains the aggregated coursework input.
+The demand input combines offtake for Vector's Waitemata and Auckland reporting regions, IDs 3 and 4. This represents regional demand and does not exactly follow Auckland's administrative boundaries. The half-hourly file contains the aggregated demand series.
 
 The series covers 1 January 2023 to 31 December 2025 in Auckland local time. UTC timestamps distinguish the repeated times when daylight saving ends. Daily totals are the sum of kWh divided by 1,000,000 to give GWh, with 46, 48 or 50 intervals depending on the length of the local day.
 

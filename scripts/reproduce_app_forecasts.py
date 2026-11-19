@@ -1,7 +1,7 @@
 """Recreate the app's linear-regression forecasts from included source data.
 
-This recreates the selected model's fit, not the wider team's model-selection
-experiments. The feature code is retained in app_forecasting.py.
+This recreates the selected model's fit without rerunning model selection.
+The feature code is in app_forecasting.py.
 """
 
 from pathlib import Path

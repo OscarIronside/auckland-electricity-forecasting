@@ -94,9 +94,9 @@ The data covers 1,096 days from 2023 to 2025. Demand combines Electricity Author
 
 Each forecast uses observations from before its date. The data includes later revisions, so these results do not show what would have been possible with information available at a real purchasing deadline. The simulation leaves out network charges, transaction costs and customer tariffs. Its savings depend on the selected assumptions. The [evaluation notes](docs/EVALUATION.md) explain these limits and the model-selection process.
 
-## Project contribution
+## Development
 
-This started as group coursework at Massey University. I worked across the model experiments and Streamlit app, using Codex for planning and debugging. I later added documentation, scripts to reproduce the results, input validation and automated tests with Codex's help.
+I worked on the modelling and Streamlit app, using Codex for planning and debugging. I later added documentation, scripts to reproduce the results, input validation and automated tests with Codex's help.
 
 ## Project files
 
