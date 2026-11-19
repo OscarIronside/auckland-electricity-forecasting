@@ -1,25 +1,33 @@
 # Auckland electricity forecasting
 
-A Python forecasting project with a Streamlit app for exploring electricity demand predictions and simulating purchasing costs.
+A Python forecasting project with a Streamlit app for exploring daily electricity demand and simulating purchasing costs.
 
-The project asks whether daily electricity demand can be predicted more accurately than simply using demand from the same weekday a week earlier. It covers regional Auckland demand and includes model comparison, a working app and scripts for reproducing the results.
+The project tests whether a model can predict Auckland regional demand more accurately than using demand from the same weekday a week earlier. The notebook compares linear regression, random forest and XGBoost. The app lets you explore forecasts and see how purchasing assumptions affect costs.
 
-**Main result:** the notebook's selected linear regression reduced historical test RMSE by **41.2%**, from **1.614 to 0.949 GWh**. The app displays a second linear-regression model with additional weather and calendar inputs, with RMSE of **0.789 GWh** on the same test dates.
+## Results
 
-This is a historical demonstration. Choosing a date displays a saved forecast. The app does not generate live predictions, and its purchasing results are simulated comparisons.
+On the 218 test days from 28 May to 31 December 2025, the notebook's selected linear regression reduced RMSE by **41.2%** against the previous-week benchmark.
+
+| Forecast | MAE (GWh) | RMSE (GWh) |
+| --- | ---: | ---: |
+| Previous-week benchmark | 1.198 | 1.614 |
+| Notebook model | 0.658 | 0.949 |
+| App model | 0.573 | 0.789 |
+
+MAE is average absolute error. RMSE gives more weight to larger errors. Lower values mean the forecasts were closer to recorded demand.
+
+The app uses a separate linear regression with additional weather and calendar features. **The 41.2% improvement refers to the notebook model.** Both models can be recreated using the included data and scripts.
 
 ## Try the app
 
-Use **Python 3.14**. No API key, cloud account or additional data download is needed. All app inputs are included.
-
-Clone the repository, or download its ZIP and open a terminal in the extracted project folder:
+Use **Python 3.14**. Download and extract the repository ZIP, or clone it:
 
 ```bash
 git clone https://github.com/OscarIronside/auckland-electricity-forecasting.git
 cd auckland-electricity-forecasting
 ```
 
-On macOS or Linux, create and activate an environment:
+Open a terminal in the project folder. On macOS or Linux:
 
 ```bash
 python3.14 -m venv .venv
@@ -33,113 +41,81 @@ py -3.14 -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
-Then install the app dependencies and launch it:
+Then install the app dependencies and start it:
 
 ```bash
 python -m pip install -r requirements-demo.txt
 python -m streamlit run app.py
 ```
 
-Open the local URL printed by Streamlit. To stop the app, press Ctrl+C in the terminal. See [setup and troubleshooting](docs/SETUP.md) if Python, environment activation or a full notebook installation needs attention.
+Open the local address printed by Streamlit. All data is included, and no API key or cloud account is needed. Press Ctrl+C to stop the app.
 
 ![Demand forecast view](docs/images/app-demand.jpg)
 
-The app has two views:
+- **Demand forecast:** choose a historical date, view recent demand, compare the forecast with the previous week and reveal actual demand.
+- **Purchasing simulation:** set the advance purchase price and resale rate, then compare the costs of using each forecast under the same rules.
 
-- **Demand forecast:** select any of the 218 test dates, view recent demand, compare the prediction with the previous-week benchmark and reveal actual demand.
-- **Purchasing simulation:** adjust the advance purchase price and surplus resale rate. Both forecasts use identical purchasing rules. Shortfalls are bought at a daily market-price proxy, while surplus is resold at the selected rate.
+Selecting a date displays a saved prediction. Purchasing costs are simulated. The app checks its inputs before showing results and displays an error if data is missing or inconsistent.
 
-Before displaying results, the app checks dates, numeric values, actual demand, benchmarks and complete price coverage. Incomplete or inconsistent inputs produce a clear error instead of partial cost totals.
+## Reproduce the models
 
-## Understand the results
-
-The notebook compares linear regression, random forest and XGBoost. It uses past demand and calendar features, selects the model using validation data, then refits it before the final test.
-
-| Period | Dates | Days after lag creation |
-| --- | --- | ---: |
-| Training | 8 January 2023 to 31 December 2024 | 724 |
-| Validation | 1 January to 27 May 2025 | 147 |
-| Test | 28 May to 31 December 2025 | 218 |
-
-| Forecast | MAE in GWh | RMSE in GWh |
-| --- | ---: | ---: |
-| Previous-week benchmark | 1.198 | 1.614 |
-| Notebook model | 0.658 | 0.949 |
-| App forecasting model | 0.573 | 0.789 |
-
-MAE measures average absolute forecast error. RMSE gives greater weight to large errors. Lower values mean predictions were closer to observed demand.
-
-The **41.2% reduction belongs to the notebook model**. The app uses a separate linear regression with additional preceding-day weather, demand-history and holiday features. Its forecasts are retained in `historical_forecasts.csv` and can be recreated with the included code. Neither result establishes future production performance.
-
-![Notebook forecasts and errors over the test period](docs/images/notebook-forecast-results.png)
-
-## Reproduce the results
-
-The following commands assume the environment above is active and the terminal is in the project folder.
-
-To refit the notebook's selected model using the daily input and check its metrics:
+With the environment active, install the modelling dependencies and run both scripts:
 
 ```bash
 python -m pip install -r requirements-evaluation.txt
 python scripts/reproduce_results.py
-```
-
-Expected test RMSE is `0.948777 GWh` against a benchmark of `1.613599 GWh`, a `41.2%` reduction. The script also validates the app inputs and scores its separate forecasts.
-
-To recreate the app's selected model from the included demand and weather inputs:
-
-```bash
 python scripts/reproduce_app_forecasts.py
 ```
 
-This checks all 218 forecasts against the committed CSV. Expected RMSE is `0.789128 GWh`. It recreates that fit, rather than rerunning every experiment from the wider group assignment.
+The first script refits the notebook's selected model. Expected RMSE is `0.948777 GWh`, against `1.613599 GWh` for the benchmark. The second recreates all 218 app forecasts and compares them with the saved predictions; expected RMSE is `0.789128 GWh`.
 
-To rerun the full notebook, including model comparison, tuning and SHAP explanations, follow the [system prerequisites](docs/SETUP.md#full-notebook-prerequisites), then run:
+### Run the full notebook
+
+The full notebook also runs the model comparisons, tuning and SHAP explanations. It needs additional packages and an OpenMP runtime for XGBoost:
+
+- **macOS:** install `libomp` with Homebrew: `brew install libomp`.
+- **Windows:** XGBoost may need the [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist).
+- **Ubuntu/Debian:** install `libgomp1` if an error mentions `libgomp.so.1`.
+
+Then run:
 
 ```bash
 python -m pip install -r requirements.txt
 python scripts/run_notebook.py
 ```
 
-The runner executes all 35 code cells and writes `reports/forecasting-executed.ipynb`. It leaves the committed notebook unchanged. You can also open `forecasting.ipynb` in a notebook editor, select this environment and run it from the project folder.
+This executes all 35 code cells and saves a copy to `reports/forecasting-executed.ipynb`. You can also open `forecasting.ipynb` in a notebook editor and run it from the project folder using this environment.
 
-To run the regression checks after installing the app and evaluation dependencies:
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-See [verification](docs/VERIFICATION.md) for the environment actually tested and the boundary between local checks and automated checks on GitHub.
+The full requirements include the app and modelling dependencies. See [verification](docs/VERIFICATION.md) for test commands and recorded checks.
 
 ## Data and limitations
 
-The demand series contains 1,096 complete days from 2023 to 2025. It aggregates Electricity Authority EMI reconciled offtake for Vector's Waitemata and Auckland reporting regions, IDs 3 and 4. This is regional electricity use, rather than an individual customer's usage or an exact administrative boundary. Daily aggregation accounts for daylight-saving transitions.
+The data covers 1,096 days from 2023 to 2025. Demand combines Electricity Authority records for Vector's Waitemata and Auckland reporting regions. Weather comes from Open-Meteo, and the purchasing simulation uses daily average prices at Otahuhu. See [data sources](docs/DATA.md) for the included files and their preparation.
 
-Included inputs and source attributions are described in [Data](docs/DATA.md). The app's Otahuhu price series is an unweighted daily average used as a regional proxy.
-
-Each test forecast uses observations preceding that date. The data is retrospective and includes later revisions, so the evaluation does not establish what information would have been available at a real purchasing deadline. It is not a single 218-day forecast made at the start of the test period.
-
-The purchasing simulation assumes fixed advance purchase prices and a chosen surplus resale rate. It omits network charges, transaction costs and customer-specific tariffs. A lower forecast error does not guarantee a lower cost under every set of assumptions. See [Evaluation](docs/EVALUATION.md) for the complete protocol and limitations.
+Each forecast uses observations from before its date. The data includes later revisions, so these results do not show what would have been possible with information available at a real purchasing deadline. The simulation leaves out network charges, transaction costs and customer tariffs. Its savings depend on the selected assumptions. The [evaluation notes](docs/EVALUATION.md) explain these limits and the model-selection process.
 
 ## Project contribution
 
-The project originated in group coursework at Massey University. Oscar Ironside contributed across the model experiments and Streamlit app, and used Codex for planning and debugging. The notebook comparison and app model are separate pieces of the group's work.
+This started as group coursework at Massey University. I worked across the model experiments and Streamlit app, using Codex for planning and debugging. I later added documentation, scripts to reproduce the results, input validation and automated tests with Codex's help.
 
-The documentation, reproduction scripts, validation checks and automated handoff checks were added during portfolio preparation with Codex assistance. They should be distinguished from the original coursework deliverable.
+## Project files
 
-## Where to look
-
-| File | Purpose |
+| File or folder | Purpose |
 | --- | --- |
-| `app.py` | Forecast viewer and purchasing simulation |
-| `data_validation.py` | Input checks shared by the app and result reproduction |
-| `forecasting.ipynb` | Explained model comparison, tuning, SHAP and test evaluation |
-| `daily_demand.csv` | 1,096 daily demand observations in GWh |
-| `historical_forecasts.csv` | 218 daily forecasts, actual demand and previous-week benchmarks |
-| `otahuhu_daily_prices.csv` | Daily price proxy and interval counts |
-| `scripts/reproduce_results.py` | Refit and score the selected notebook model |
-| `scripts/reproduce_app_forecasts.py` | Recreate the app's forecasting model |
-| `scripts/app_forecasting.py` | App-model data preparation and feature code |
-| `data/` | Included half-hourly demand and hourly weather inputs |
-| `tests/` | Data-validation and app regression checks |
-| `docs/` | Setup, provenance, evaluation and verification |
+| `app.py`, `data_validation.py` | App and input checks |
+| `forecasting.ipynb` | Modelling, evaluation and explanations |
+| Root CSV files | Daily demand, saved forecasts and daily prices |
+| `data/` | Half-hourly demand and hourly weather |
+| `scripts/` | Model reproduction and notebook runner |
+| `tests/`, `.github/workflows/` | Regression tests and automated checks |
+| `docs/` | Data sources, evaluation and verification |
+
+## Troubleshooting
+
+- **Python is unavailable:** install Python 3.14 from [python.org](https://www.python.org/downloads/). Check with `python3.14 --version` on macOS/Linux or `py -3.14 --version` on Windows.
+- **PowerShell blocks activation:** use `.venv\Scripts\python.exe` in place of `python` in the install and run commands.
+- **Files cannot be found:** extract the whole ZIP and run commands from the folder containing `app.py`. Keep the supplied filenames and `data/` folder.
+- **The app reports invalid data:** restore the original CSVs and restart the app.
+- **The port is occupied:** add `--server.port 8502` to the app command.
+
+After activating the environment, `python --version` should report 3.14 and `python -m pip --version` should point into `.venv`.

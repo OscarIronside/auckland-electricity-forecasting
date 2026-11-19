@@ -1,29 +1,25 @@
 # Verification
 
-Verified locally on 20 November 2026 using Python 3.14.3 on macOS, with a newly created environment and the supplied dependency versions. This machine already has the OpenMP runtime needed by XGBoost.
+Checked on 20 November 2026 using Python 3.14.3 on macOS, in a fresh environment. The machine already had the OpenMP runtime required by XGBoost.
 
 | Check | Result |
 | --- | --- |
-| Fresh installation | App, evaluation and full notebook requirements installed successfully |
-| Dependency consistency | `python -m pip check` passed |
-| Complete notebook | All 35 code cells executed without notebook errors in the fresh environment |
-| Regression checks | All 18 tests passed |
-| Forecast-date display | All 218 dates checked, with matching forecast and benchmark values |
-| Actual-demand control | Both states checked |
-| Purchasing calculation | 12 price/resale combinations matched independent row-by-row calculations |
-| Incomplete prices | Removing one price date now stops the app before any metrics are shown |
-| Other invalid inputs | Missing files/columns/days, duplicate dates, non-numeric or non-finite values, negative forecasts and mismatched actuals/benchmarks rejected |
-| Timestamp regression | Notebook completeness check passed across both daylight-saving transitions with nanosecond and microsecond indexes |
-| Notebook model | Test RMSE 0.948777 GWh, MAE 0.658474 GWh |
-| Previous-week benchmark | Test RMSE 1.613599 GWh |
-| Relative RMSE reduction | 41.2012% |
-| App forecasting model | All 218 forecasts recreated and matched the committed export to numerical precision |
-| App-model metrics | RMSE 0.789128 GWh, MAE 0.573424 GWh |
-| Browser | Both revised views loaded, the actual-demand chart rendered and the purchasing explanation opened |
+| Installation | App, model and full notebook dependencies installed; `pip check` passed |
+| Regression tests | All 18 passed |
+| App dates | All 218 dates displayed the expected forecast and benchmark |
+| Actual-demand toggle | Both states checked |
+| Purchasing calculations | 12 price/resale combinations matched independent calculations |
+| Invalid data | Missing files, columns or dates, duplicate dates, invalid values and mismatched actuals or benchmarks were rejected |
+| Missing prices | App stopped before displaying metrics |
+| Daylight saving | Both transitions checked with nanosecond and microsecond timestamps |
+| Notebook result | RMSE 0.948777 GWh against benchmark 1.613599 GWh; reduction 41.2% |
+| App model | All 218 forecasts recreated; RMSE 0.789128 GWh |
+| Full notebook | All 35 code cells executed without errors |
+| Browser | Both app views and their controls checked |
 
-## Repeat the checks
+## Run the checks
 
-From the repository root with the app and evaluation dependencies installed:
+After installing the app and model dependencies from the [README](../README.md):
 
 ```bash
 python -m pip check
@@ -32,18 +28,20 @@ python scripts/reproduce_results.py
 python scripts/reproduce_app_forecasts.py
 ```
 
-With the full notebook dependencies and the system prerequisites from [Setup](SETUP.md):
+To run all notebook cells, install the full requirements and follow the [notebook prerequisites](../README.md#run-the-full-notebook), then run:
 
 ```bash
 python scripts/run_notebook.py
 ```
 
-The runner saves refreshed output under `reports/`, leaving the committed notebook unchanged. The selected-model report is in [reproduced_metrics.json](reproduced_metrics.json), and input checksums are in [data_manifest.json](data_manifest.json).
+The runner saves an executed copy under `reports/`. The reproduction scripts print their results. To save a JSON report as well:
 
-## Automated checks
+```bash
+python scripts/reproduce_results.py --output reports/metrics.json
+```
 
-The [GitHub Actions workflow](../.github/workflows/verify.yml) installs the smaller dependency sets and runs the tests and both model reproductions on Ubuntu, macOS and Windows with Python 3.14. A separate Ubuntu job executes the complete notebook.
+## GitHub checks
 
-Workflow configuration alone is not proof of a pass. Check the [actual run results](https://github.com/OscarIronside/auckland-electricity-forecasting/actions) for the commit being reviewed. Until a run has completed successfully, the corresponding platform remains unverified.
+The [workflow](../.github/workflows/verify.yml) runs app tests and both model reproductions on Ubuntu, macOS and Windows. A separate Ubuntu job runs the full notebook. The [run history](https://github.com/OscarIronside/auckland-electricity-forecasting/actions) shows the outcome for each commit.
 
-No hosted deployment or production forecast service is claimed. The historical information-availability and purchasing assumptions remain as described in [Evaluation](EVALUATION.md).
+These checks cover the historical project. They do not test a hosted app or live forecasting service.
