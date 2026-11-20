@@ -2,6 +2,8 @@
 
 A Python forecasting project with a Streamlit app for exploring daily electricity demand and simulating purchasing costs.
 
+[View the project walkthrough (PDF)](docs/project-walkthrough.pdf) for a visual overview of the approach, results and app.
+
 The project tests whether a model can predict Auckland regional demand more accurately than using demand from the same weekday a week earlier. The notebook compares linear regression, random forest and XGBoost. The app lets you explore forecasts and see how purchasing assumptions affect costs.
 
 ## Results
@@ -108,7 +110,7 @@ I worked on the modelling and Streamlit app, using Codex for planning and debugg
 | `data/` | Half-hourly demand and hourly weather |
 | `scripts/` | Model reproduction and notebook runner |
 | `tests/`, `.github/workflows/` | Regression tests and automated checks |
-| `docs/` | Data sources, evaluation and verification |
+| `docs/` | PDF walkthrough, data sources, evaluation and verification |
 
 ## Troubleshooting
 
